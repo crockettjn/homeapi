@@ -2,11 +2,7 @@
 
 import time
 import RPi.GPIO as io
-#from flask import Flask, request, session
-from flask import Flask
-from flask import request
-from flask import render_template
-from flask import redirect, url_for
+from flask import Flask, request#, session
 
 app = Flask(__name__)
 
@@ -17,8 +13,8 @@ relayPin = 17
 
 io.setup(openStop, io.IN, pull_up_down=io.PUD_UP)
 io.setup(closeStop, io.IN, pull_up_down=io.PUD_UP)
-io.setup(relayPin, io.OUT)
-io.output(relayPin, io.HIGH)
+#io.setup(relayPin, io.OUT)
+#io.output(relayPin, io.HIGH)
 
 @app.route("/")
 def index():
@@ -33,7 +29,10 @@ def status():
 
 @app.route("/garage/toggle")
 def toggle():
+    io.setup(relayPin, io.OUT)
+    io.output(relayPin, io.HIGH)
     toggleRelay(relayPin)
+    io.cleanup(relayPin)
     return "Door Toggled"
 
 def toggleRelay(relayPin):

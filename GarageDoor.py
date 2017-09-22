@@ -11,8 +11,8 @@ openStop = 23
 closeStop = 24
 relayPin = 17
 
-io.setup(openStop, io.IN, pull_up_down=io.PUD_UP)
-io.setup(closeStop, io.IN, pull_up_down=io.PUD_UP)
+#io.setup(openStop, io.IN, pull_up_down=io.PUD_UP)
+#io.setup(closeStop, io.IN, pull_up_down=io.PUD_UP)
 #io.setup(relayPin, io.OUT)
 #io.output(relayPin, io.HIGH)
 
@@ -49,6 +49,8 @@ def toggle():
         return "Error!"
 
 def getDoorStatus():
+    io.setup(openStop, io.IN, pull_up_down=io.PUD_UP)
+    io.setup(closeStop, io.IN, pull_up_down=io.PUD_UP)
     doorState = getCurrentState()
     if io.input(openStop):
         ts = False
@@ -59,7 +61,8 @@ def getDoorStatus():
         bs = False
     else:
         bs = True
-
+    io.cleanup(openStop)
+    io.cleanup(closeStop)
     if ts == True:
         writeFile('open')
         return('open')
@@ -72,9 +75,10 @@ def getDoorStatus():
         else:
             return('opening')
 
+
 def getCurrentState():
     f = open('doorState', 'r')
-    doorState = f.readline()
+    doorState = f.readline().rstrip()
     f.close()
     return doorState
 

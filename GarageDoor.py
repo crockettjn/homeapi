@@ -1,13 +1,19 @@
+#!/usr/bin/env python
+
 import time
 import RPi.GPIO as io
-from flask import Flask, request, session
+#from flask import Flask, request, session
+from flask import Flask
+from flask import request
+from flask import render_template
+from flask import redirect, url_for
 
 app = Flask(__name__)
-io.cleanup()
+
 io.setmode(io.BCM)
-openStop = 5
-closeStop = 6
-relayPin = 4
+openStop = 23
+closeStop = 24
+relayPin = 17
 
 io.setup(openStop, io.IN, pull_up_down=io.PUD_UP)
 io.setup(closeStop, io.IN, pull_up_down=io.PUD_UP)
@@ -65,3 +71,6 @@ def writeFile(status):
     f = open('doorState', 'w')
     f.write(status)
     f.close()
+
+if __name__=='__main__':
+    app.run(host='0.0.0.0')

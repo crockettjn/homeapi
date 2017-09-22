@@ -2,7 +2,7 @@
 
 import time
 import RPi.GPIO as io
-from flask import Flask, request#, session
+from flask import Flask, request
 
 app = Flask(__name__)
 
@@ -31,19 +31,25 @@ def status():
 def toggle():
     io.setup(relayPin, io.OUT)
     io.output(relayPin, io.HIGH)
-    toggleRelay(relayPin)
-    io.cleanup(relayPin)
-    return "Door Toggled"
 
-def toggleRelay(relayPin):
     io.output(relayPin, io.LOW)
     time.sleep(1)
     io.output(relayPin, io.HIGH)
+    doorState = getCurrentState()
+    io.cleanup(relayPin)
+    if doorState == 'open':
+        return "Close Command Sent."
+    elif doorState == 'closed':
+        return "Open Command Sent."
+    elif doorState == 'closing':
+        return "Door Closing Stopped"
+    elif doorState == 'opening':
+        return "Door Opening Stopped"
+    else:
+        return "Error!"
 
 def getDoorStatus():
-    f = open('doorState', 'r')
-    doorState = f.readline()
-    f.close()
+    doorState = getCurrentState()
     if io.input(openStop):
         ts = False
     else:
@@ -65,6 +71,12 @@ def getDoorStatus():
             return('closing')
         else:
             return('opening')
+
+def getCurrentState():
+    f = open('doorState', 'r')
+    doorState = f.readline()
+    f.close()
+    return doorState
 
 def writeFile(status):
     f = open('doorState', 'w')
